@@ -6,7 +6,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace hair_harmony_be.controller
 {
@@ -30,8 +31,7 @@ namespace hair_harmony_be.controller
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             // Kiểm tra User có tồn tại không
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == request.UserName && u.Password == request.Password);
+            var user = await GetUserIfExists(request.Password, request.UserName);
 
             if (user == null)
             {
@@ -55,10 +55,10 @@ namespace hair_harmony_be.controller
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role.Title) // Nếu có quyền hạn
-            };
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.Role, user.Role?.Title ?? "User") // Kiểm tra nếu Role là null thì lấy giá trị mặc định là "User"
+    };
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
@@ -70,11 +70,43 @@ namespace hair_harmony_be.controller
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Các API khác...
 
-        private bool UserExists(int id)
+        /// <summary>
+        /// API lấy tất cả người dùng.
+        /// </summary>
+        [HttpGet("getAll")]
+        [Authorize(Policy = "admin")]  // Chỉ cần xác thực người dùng
+        public async Task<IActionResult> GetAllUsers()
         {
-            return _context.Users.Any(e => e.Id == id);
+            var users = await _context.Users
+                .Include(u => u.Role)  // Bao gồm thông tin Role
+                .Include(u => u.LevelAccount)  // Bao gồm thông tin LevelAccount
+                .ToListAsync();
+
+            var userDtos = users.Select(user => new
+            {
+                user.Id,
+                user.UserName,
+                user.FullName,
+                Gender = user.Gender ? "Male" : "Female", // Chuyển đổi giới tính
+                Dob = user.Dob.HasValue ? user.Dob.Value.ToString("yyyy-MM-dd") : null, // Chuyển đổi ngày sinh nếu có
+                user.Address,
+                Role = user.Role?.Title ?? "Unknown", // Giá trị mặc định nếu không có Role
+                Email = user?.Email ?? "Unknown", // Giá trị mặc định nếu không có Role
+                LevelAccount = user.LevelAccount?.Title ?? "Unknown", // Giá trị mặc định nếu không có LevelAccount
+                user.Status
+            }).ToList();
+
+            return Ok(userDtos);
+        }
+
+        private async Task<User> GetUserIfExists(string password, string userName)
+        {
+            // Tìm người dùng thỏa mãn các điều kiện
+
+            return await _context.Users
+                .Include(u => u.Role)  // Bao gồm thông tin Role
+                .FirstOrDefaultAsync(u => u.Password == password && u.UserName == userName && u.Status == true);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
+﻿
+using System.Text.Json.Serialization;
 namespace hair_harmony_be.hair_harmony_be.repositoty.model
 {
     public class User
@@ -8,14 +8,26 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public string FullName { get; set; } // fullName đổi thành PascalCase
         public string UserName { get; set; } // Đổi kiểu từ DateTime sang string
         public bool Gender { get; set; } // Boolean đổi thành bool (kiểu chuẩn của C#)
-        public string Password { get; set; } // Boolean đổi thành bool (kiểu chuẩn của C#)
+        public string? Email { get; set; }
+        [JsonIgnore] // Bỏ qua khi trả về trong API
+         public string Password { get; set; }
 
-        public DateTime Dob { get; set; } // dob đổi thành PascalCase
-        public string Address { get; set; }
-        public float SalaryStaff { get; set; } // salary_staff đổi thành PascalCase
-        public LevelAccount LevelAccount { get; set; }
+        public DateTime? Dob { get; set; } // dob đổi thành PascalCase
+        public string? Address { get; set; }
+        public LevelAccount? LevelAccount { get; set; }
         public Role Role { get; set; }
-        public DateTime CreateOn { get; set; }
-        public DateTime UpdateOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public bool Status { get; set; }
+
+        public DateTime UpdatedOn { get; set; }
+
+    }
+
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string RoleName { get; set; }
+        public bool Status { get; set; }
     }
 }

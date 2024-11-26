@@ -1,12 +1,12 @@
 ﻿using HairSalon.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cấu hình JWT
+// Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -31,36 +31,69 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddControllers();
-// Đăng ký Swagger
-builder.Services.AddSwaggerGen();
+// Cấu hình Authorization (vai trò người dùng)
+builder.Services.AddAuthorization(options =>
+{
+    // Thêm các policy tùy chọn nếu cần thiết
+    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
 
-// Đăng ký DbContext
+    options.AddPolicy("staff", policy => policy.RequireRole("staff"));
+
+    options.AddPolicy("user", policy => policy.RequireRole("user"));
+
+});
+// Thêm Swagger để hỗ trợ Bearer Authentication
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
+// Đăng ký DbContext, Swagger, Controllers...
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("UserList"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Đăng ký controller
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Sử dụng Swagger UI
+// Middleware để sử dụng Authentication và Authorization
+app.UseAuthentication(); // Đảm bảo Authentication được bật
+app.UseAuthorization();  // Đảm bảo Authorization được bật
+
+// Sử dụng Swagger trong môi trường phát triển
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "swagger"; // Truy cập Swagger tại URL: /swagger
+        c.RoutePrefix = "swagger"; // Cấu hình đường dẫn Swagger UI
     });
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // Thêm dòng này để sử dụng xác thực JWT
-app.UseAuthorization();
-
-// Ánh xạ controller
-app.MapControllers();
+app.MapControllers(); // Chạy các controller
 
 app.Run();

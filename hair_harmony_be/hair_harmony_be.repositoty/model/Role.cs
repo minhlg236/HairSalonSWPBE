@@ -8,5 +8,7 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public string Title { get; set; }
         public DateTime CreateOn { get; set; } // Sử dụng DateTime thay cho date
         public DateTime UpdateOn { get; set; } // Sử dụng DateTime thay cho date
+        public bool Status { get; set; }
+
     }
 }
