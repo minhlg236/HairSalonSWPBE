@@ -11,10 +11,8 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public string? Email { get; set; }
         [JsonIgnore] // Bỏ qua khi trả về trong API
          public string Password { get; set; }
-
         public DateTime? Dob { get; set; } // dob đổi thành PascalCase
         public string? Address { get; set; }
-        public LevelAccount? LevelAccount { get; set; }
         public Role Role { get; set; }
         public DateTime CreatedOn { get; set; }
         public bool Status { get; set; }

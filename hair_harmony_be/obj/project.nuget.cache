@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RoD+ia73COn8JKQ/MOOkowW2aeV0aRVMkyhs5k0EdbrDMF+jb0NfabnriqZ5txTYAgKUWDeOHiRQXeVa+mHPIw==",
+  "dgSpecHash": "myUlMTG015MBv2ZJzTbOEkY315l3wQxkGvjcwxZZ3W9co7NaLN1IU/kxW4X1xpLVJIhZ+ixwkPUWcG/euXLZww==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\source\\repos\\hair_harmony_be\\hair_harmony_be\\hair_harmony_be.csproj",
+  "projectFilePath": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

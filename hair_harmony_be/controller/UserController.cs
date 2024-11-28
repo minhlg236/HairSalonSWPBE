@@ -80,7 +80,6 @@ namespace hair_harmony_be.controller
         {
             var users = await _context.Users
                 .Include(u => u.Role)  // Bao gồm thông tin Role
-                .Include(u => u.LevelAccount)  // Bao gồm thông tin LevelAccount
                 .ToListAsync();
 
             var userDtos = users.Select(user => new
@@ -93,7 +92,6 @@ namespace hair_harmony_be.controller
                 user.Address,
                 Role = user.Role?.Title ?? "Unknown", // Giá trị mặc định nếu không có Role
                 Email = user?.Email ?? "Unknown", // Giá trị mặc định nếu không có Role
-                LevelAccount = user.LevelAccount?.Title ?? "Unknown", // Giá trị mặc định nếu không có LevelAccount
                 user.Status
             }).ToList();
 
@@ -108,5 +106,51 @@ namespace hair_harmony_be.controller
                 .Include(u => u.Role)  // Bao gồm thông tin Role
                 .FirstOrDefaultAsync(u => u.Password == password && u.UserName == userName && u.Status == true);
         }
+
+
+        /// <summary>
+        /// API lấy thông tin profile người dùng dựa trên JWT Token.
+        /// </summary>
+        [HttpGet("profile")]
+        [Authorize] // Bắt buộc phải có xác thực
+        public async Task<IActionResult> GetUserProfile()
+        {
+            // Lấy thông tin userId từ token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Không xác định được người dùng.");
+            }
+
+            // Truy vấn thông tin người dùng từ cơ sở dữ liệu
+            var user = await _context.Users
+                .Include(u => u.Role) // Bao gồm thông tin Role nếu cần
+                .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (user == null)
+            {
+                return NotFound("Người dùng không tồn tại.");
+            }
+
+            // Trả về thông tin người dùng
+            var userProfile = new
+            {
+                user.Id,
+                user.UserName,
+                user.FullName,
+                Gender = user.Gender ? "Male" : "Female",
+                Dob = user.Dob.HasValue ? user.Dob.Value.ToString("yyyy-MM-dd") : null,
+                user.Address,
+                user.Email,
+                Role = user.Role?.Title ?? "Unknown",
+                user.Status,
+                CreatedOn = user.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss"),
+                UpdatedOn = user.UpdatedOn.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            return Ok(userProfile);
+        }
+
     }
 }

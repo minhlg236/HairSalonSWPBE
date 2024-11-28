@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,33 +35,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Cấu hình Authorization (vai trò người dùng)
 builder.Services.AddAuthorization(options =>
 {
-    // Thêm các policy tùy chọn nếu cần thiết
     options.AddPolicy("admin", policy => policy.RequireRole("admin"));
-
     options.AddPolicy("staff", policy => policy.RequireRole("staff"));
-
+    options.AddPolicy("stylist", policy => policy.RequireRole("stylist"));
     options.AddPolicy("user", policy => policy.RequireRole("user"));
-
 });
-// Thêm Swagger để hỗ trợ Bearer Authentication
+
+// Đăng ký Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    // Định nghĩa Bearer Token cho Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    // Thêm yêu cầu xác thực cho các endpoint
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                Reference = new OpenApiReference
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
             },
@@ -68,18 +70,19 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-// Đăng ký DbContext, Swagger, Controllers...
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Middleware để sử dụng Authentication và Authorization
-app.UseAuthentication(); // Đảm bảo Authentication được bật
-app.UseAuthorization();  // Đảm bảo Authorization được bật
+app.UseHttpsRedirection();
+
+// Middleware Authentication và Authorization
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Sử dụng Swagger trong môi trường phát triển
 if (app.Environment.IsDevelopment())
@@ -88,12 +91,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "swagger"; // Cấu hình đường dẫn Swagger UI
+        c.RoutePrefix = "swagger"; // Đường dẫn truy cập Swagger UI
     });
 }
 
-app.UseHttpsRedirection();
-
-app.MapControllers(); // Chạy các controller
+// Map các controller
+app.MapControllers();
 
 app.Run();

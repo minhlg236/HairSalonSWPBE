@@ -8134,11 +8134,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\source\\repos\\hair_harmony_be\\hair_harmony_be\\hair_harmony_be.csproj",
+      "projectUniqueName": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.csproj",
       "projectName": "hair_harmony_be",
-      "projectPath": "C:\\Users\\Admin\\source\\repos\\hair_harmony_be\\hair_harmony_be\\hair_harmony_be.csproj",
+      "projectPath": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\source\\repos\\hair_harmony_be\\hair_harmony_be\\obj\\",
+      "outputPath": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
