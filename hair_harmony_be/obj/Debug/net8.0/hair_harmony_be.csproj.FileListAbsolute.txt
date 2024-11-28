@@ -223,3 +223,4 @@ D:\project_thue\HairSalonSWPBE\hair_harmony_be\obj\Debug\net8.0\scopedcss\projec
 D:\project_thue\HairSalonSWPBE\hair_harmony_be\obj\Debug\net8.0\hair_har.5E300B29.Up2Date
 D:\project_thue\HairSalonSWPBE\hair_harmony_be\obj\Debug\net8.0\hair_harmony_be.genruntimeconfig.cache
 D:\project_thue\HairSalonSWPBE\hair_harmony_be\obj\Debug\net8.0\ref\hair_harmony_be.dll
+D:\project_thue\HairSalonSWPBE\hair_harmony_be\bin\Debug\net8.0\BCrypt.Net-Next.dll

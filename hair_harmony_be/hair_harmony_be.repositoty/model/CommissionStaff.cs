@@ -10,7 +10,7 @@
         public DateTime UpdatedOn { get; set; }
 
         public User Staff { get; set; }
-        public Style Style { get; set; }
+        public Service Style { get; set; }
         public bool Status { get; set; }
 
     }

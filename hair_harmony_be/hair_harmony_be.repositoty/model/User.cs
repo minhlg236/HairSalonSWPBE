@@ -10,7 +10,7 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public bool Gender { get; set; } // Boolean đổi thành bool (kiểu chuẩn của C#)
         public string? Email { get; set; }
         [JsonIgnore] // Bỏ qua khi trả về trong API
-         public string Password { get; set; }
+        public string Password { get; set; }
         public DateTime? Dob { get; set; } // dob đổi thành PascalCase
         public string? Address { get; set; }
         public Role Role { get; set; }
@@ -28,4 +28,16 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public string RoleName { get; set; }
         public bool Status { get; set; }
     }
+
+    public class RegisterRequest
+    {
+        public string FullName { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string Email { get; set; }
+        public bool Gender { get; set; }
+        public DateTime? Dob { get; set; }
+        public string? Address { get; set; }
+    }
+
 }

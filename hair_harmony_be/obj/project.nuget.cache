@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "myUlMTG015MBv2ZJzTbOEkY315l3wQxkGvjcwxZZ3W9co7NaLN1IU/kxW4X1xpLVJIhZ+ixwkPUWcG/euXLZww==",
+  "dgSpecHash": "NtUIlyOfyF/XyS1uV66ujOSLDmrw37wYlOOdAEKB+LEWuanW+pHR475o4tIb0QqS9c3ah9W4p83int4LVuFEZw==",
   "success": true,
   "projectFilePath": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\fromheaderattribute\\2.0.4\\fromheaderattribute.2.0.4.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnet.webapi.client\\5.2.4\\microsoft.aspnet.webapi.client.5.2.4.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnet.webapi.core\\5.2.4\\microsoft.aspnet.webapi.core.5.2.4.nupkg.sha512",

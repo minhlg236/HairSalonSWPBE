@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 
 
 namespace hair_harmony_be.controller
@@ -16,12 +17,12 @@ namespace hair_harmony_be.controller
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration; // Thêm khai báo này
+        private readonly IConfiguration _configuration;
 
         public UserController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
-            _configuration = configuration; // Gán giá trị trong constructor
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -30,7 +31,6 @@ namespace hair_harmony_be.controller
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // Kiểm tra User có tồn tại không
             var user = await GetUserIfExists(request.Password, request.UserName);
 
             if (user == null)
@@ -38,13 +38,14 @@ namespace hair_harmony_be.controller
                 return Unauthorized("Sai tài khoản hoặc mật khẩu.");
             }
 
-            // Tạo JWT Token
             var token = GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken(user.Id.ToString());
 
             return Ok(new
             {
                 Message = "Đăng nhập thành công",
-                Token = token
+                Token = token,
+                RefreshToken = refreshToken
             });
         }
 
@@ -55,10 +56,10 @@ namespace hair_harmony_be.controller
 
             var claims = new[]
             {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.Role, user.Role?.Title ?? "User") // Kiểm tra nếu Role là null thì lấy giá trị mặc định là "User"
-    };
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Role, user.Role?.Title ?? "User")
+        };
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
@@ -70,62 +71,116 @@ namespace hair_harmony_be.controller
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
-        /// <summary>
-        /// API lấy tất cả người dùng.
-        /// </summary>
-        [HttpGet("getAll")]
-        [Authorize(Policy = "admin")]  // Chỉ cần xác thực người dùng
-        public async Task<IActionResult> GetAllUsers()
+        [HttpPost("refresh-token")]
+        public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            var users = await _context.Users
-                .Include(u => u.Role)  // Bao gồm thông tin Role
-                .ToListAsync();
-
-            var userDtos = users.Select(user => new
+            try
             {
-                user.Id,
-                user.UserName,
-                user.FullName,
-                Gender = user.Gender ? "Male" : "Female", // Chuyển đổi giới tính
-                Dob = user.Dob.HasValue ? user.Dob.Value.ToString("yyyy-MM-dd") : null, // Chuyển đổi ngày sinh nếu có
-                user.Address,
-                Role = user.Role?.Title ?? "Unknown", // Giá trị mặc định nếu không có Role
-                Email = user?.Email ?? "Unknown", // Giá trị mặc định nếu không có Role
-                user.Status
-            }).ToList();
+                // Kiểm tra Refresh Token có hợp lệ không
+                if (string.IsNullOrEmpty(request.RefreshToken))
+                {
+                    return BadRequest("Refresh token không được để trống.");
+                }
 
-            return Ok(userDtos);
+                // Giải mã và kiểm tra Refresh Token
+                var principal = ValidateToken(request.RefreshToken);
+                if (principal == null)
+                {
+                    return Unauthorized("Refresh token không hợp lệ.");
+                }
+
+                // Lấy thông tin userId từ Refresh Token
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("Không thể lấy userId từ refresh token.");
+                }
+
+                // Tạo JWT mới với thông tin người dùng
+                var user = _context.Users.FirstOrDefault(u => u.Id.ToString() == userId);
+                if (user == null)
+                {
+                    return Unauthorized("Người dùng không tồn tại.");
+                }
+
+                var newToken = GenerateJwtToken(user);
+                var newRefreshToken = GenerateRefreshToken(userId);
+
+                return Ok(new
+                {
+                    Token = newToken,
+                    RefreshToken = newRefreshToken
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi: {ex.Message}");
+            }
+        }
+
+        private ClaimsPrincipal ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string GenerateRefreshToken(string userId)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, userId)
+        };
+
+            var token = new JwtSecurityToken(
+                null,
+                null,
+                claims,
+                expires: DateTime.UtcNow.AddDays(7), // Refresh Token có hiệu lực 7 ngày
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private async Task<User> GetUserIfExists(string password, string userName)
         {
-            // Tìm người dùng thỏa mãn các điều kiện
-
             return await _context.Users
-                .Include(u => u.Role)  // Bao gồm thông tin Role
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Password == password && u.UserName == userName && u.Status == true);
         }
 
-
-        /// <summary>
-        /// API lấy thông tin profile người dùng dựa trên JWT Token.
-        /// </summary>
         [HttpGet("profile")]
-        [Authorize] // Bắt buộc phải có xác thực
+        [Authorize]
         public async Task<IActionResult> GetUserProfile()
         {
-            // Lấy thông tin userId từ token
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized("Không xác định được người dùng.");
             }
 
-            // Truy vấn thông tin người dùng từ cơ sở dữ liệu
             var user = await _context.Users
-                .Include(u => u.Role) // Bao gồm thông tin Role nếu cần
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
 
             if (user == null)
@@ -133,7 +188,6 @@ namespace hair_harmony_be.controller
                 return NotFound("Người dùng không tồn tại.");
             }
 
-            // Trả về thông tin người dùng
             var userProfile = new
             {
                 user.Id,
@@ -151,6 +205,6 @@ namespace hair_harmony_be.controller
 
             return Ok(userProfile);
         }
-
     }
+
 }

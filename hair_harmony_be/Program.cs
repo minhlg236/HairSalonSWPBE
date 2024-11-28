@@ -41,10 +41,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("user", policy => policy.RequireRole("user"));
 });
 
-// Đăng ký Swagger
+// Cấu hình Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    // Định nghĩa Bearer Token cho Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -54,7 +53,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    // Thêm yêu cầu xác thực cho các endpoint
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -71,14 +69,29 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Thêm DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Đăng ký dịch vụ CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin() // Cho phép tất cả domain
+              .AllowAnyMethod() // Cho phép tất cả HTTP method
+              .AllowAnyHeader(); // Cho phép tất cả header
+    });
+});
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+// Kích hoạt CORS middleware
+app.UseCors("AllowAll"); // Sử dụng policy "AllowAll"
 
 // Middleware Authentication và Authorization
 app.UseAuthentication();

@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string Url { get; set; }
-        public Style Style { get; set; }
+        public Service ServiceEntity { get; set; }
         public int CreatedBy { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

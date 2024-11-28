@@ -1,13 +1,34 @@
 [
   {
-    "ContainingType": "hair_harmony_be.controller.UserController",
-    "Method": "GetAllUsers",
-    "RelativePath": "api/User/getAll",
+    "ContainingType": "hair_harmony_be.controller.ServiceController",
+    "Method": "GetStylesWithImages",
+    "RelativePath": "api/Service/getAll",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.PagedResult\u00601[[hair_harmony_be.hair_harmony_be.repositoty.model.StyleWithImages, hair_harmony_be, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "hair_harmony_be.controller.UserController",
@@ -33,6 +54,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "hair_harmony_be.controller.UserController",
+    "Method": "RefreshToken",
+    "RelativePath": "api/User/refresh-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.RefreshTokenRequest",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   }
 ]
