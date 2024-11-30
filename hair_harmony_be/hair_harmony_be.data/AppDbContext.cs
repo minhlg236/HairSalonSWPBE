@@ -13,8 +13,8 @@ namespace HairSalon.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Image> Images { get; set; }
-
-        public DbSet<CommissionStaff> CommissionStaffs { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            
@@ -41,6 +41,36 @@ namespace HairSalon.Data
                .WithMany()
                .HasForeignKey("createdBy");
 
+            modelBuilder.Entity<Booking>()
+            .HasOne(b => b.Service)
+            .WithMany()
+           .HasForeignKey("serviceId");
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.CreatedBy)
+                .WithMany()
+                .HasForeignKey("createdBy");
+
+            // payment
+            modelBuilder.Entity<PaymentTransaction>()
+           .HasOne(b => b.Booking)
+           .WithMany()
+          .HasForeignKey("bookingId");
+
+            modelBuilder.Entity<PaymentTransaction>()
+                .HasOne(b => b.CreatedBy)
+                .WithMany()
+                .HasForeignKey("createdBy");
+
+            modelBuilder.Entity<PaymentTransaction>()
+                .HasOne(b => b.UpdatedBy)
+                .WithMany()
+                .HasForeignKey("updatedBy");
+
+            modelBuilder.Entity<PaymentTransaction>()
+               .HasOne(b => b.Stylist)
+               .WithMany()
+               .HasForeignKey("stylistId");
         }
     }
 }

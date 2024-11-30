@@ -76,27 +76,23 @@ namespace hair_harmony_be.controller
         {
             try
             {
-                // Kiểm tra Refresh Token có hợp lệ không
                 if (string.IsNullOrEmpty(request.RefreshToken))
                 {
                     return BadRequest("Refresh token không được để trống.");
                 }
 
-                // Giải mã và kiểm tra Refresh Token
                 var principal = ValidateToken(request.RefreshToken);
                 if (principal == null)
                 {
                     return Unauthorized("Refresh token không hợp lệ.");
                 }
 
-                // Lấy thông tin userId từ Refresh Token
                 var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized("Không thể lấy userId từ refresh token.");
                 }
 
-                // Tạo JWT mới với thông tin người dùng
                 var user = _context.Users.FirstOrDefault(u => u.Id.ToString() == userId);
                 if (user == null)
                 {
@@ -164,10 +160,20 @@ namespace hair_harmony_be.controller
 
         private async Task<User> GetUserIfExists(string password, string userName)
         {
-            return await _context.Users
+            // Lấy người dùng theo UserName trước
+            var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Password == password && u.UserName == userName && u.Status == true);
+                .FirstOrDefaultAsync(u => u.UserName == userName && u.Status == true);
+
+            // Nếu người dùng không tồn tại hoặc mật khẩu không khớp, trả về null
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                return null;
+            }
+
+            return user;
         }
+
 
         [HttpGet("profile")]
         [Authorize]
@@ -204,6 +210,83 @@ namespace hair_harmony_be.controller
             };
 
             return Ok(userProfile);
+        }
+
+        /// <summary>
+        /// API tạo tài khoản người dùng với role mặc định là "User".
+        /// </summary>
+        [HttpPost("create-user")]
+        public async Task<IActionResult> CreateUser([FromBody] RegisterRequest request)
+        {
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            {
+                return BadRequest("Tên đăng nhập đã tồn tại.");
+            }
+
+            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Title == "user");
+            if (defaultRole == null)
+            {
+                return NotFound("Không tìm thấy role 'User'.");
+            }
+
+            var newUser = new User
+            {
+                UserName = request.UserName,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                FullName = request.FullName,
+                Email = request.Email,
+                Gender = request.Gender,
+                Dob = request.Dob,
+                Address = request.Address,
+                Role = defaultRole,
+                Status = true,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            return Ok("Tạo tài khoản người dùng thành công.");
+        }
+
+        /// <summary>
+        /// API đăng ký tài khoản với role mặc định là "Staff".
+        /// </summary>
+        [HttpPost("register-staff")]
+        [Authorize(Policy = "admin")]
+        public async Task<IActionResult> RegisterStaff([FromBody] RegisterRequest request)
+        {
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            {
+                return BadRequest("Tên đăng nhập đã tồn tại.");
+            }
+
+            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Title == "staff");
+            if (defaultRole == null)
+            {
+                return NotFound("Không tìm thấy role 'Staff'.");
+            }
+
+            var newStaff = new User
+            {
+                UserName = request.UserName,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                FullName = request.FullName,
+                Email = request.Email,
+                Gender = request.Gender,
+                Dob = request.Dob,
+                Address = request.Address,
+                Role = defaultRole,
+                Status = true,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
+            };
+
+            _context.Users.Add(newStaff);
+            await _context.SaveChangesAsync();
+
+            return Ok("Đăng ký tài khoản staff thành công.");
         }
     }
 

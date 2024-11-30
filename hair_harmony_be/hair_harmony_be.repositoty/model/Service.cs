@@ -31,7 +31,6 @@
     public class StyleWithImages
     {
         public Service ServiceEnity { get; set; }
-        // Một Style có thể có nhiều Image
         public ICollection<Image> Images { get; set; }
     }
     public class PagedResult<T>

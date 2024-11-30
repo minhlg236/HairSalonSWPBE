@@ -42,6 +42,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Cấu hình Swagger
+builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -69,11 +70,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Thêm DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Đăng ký dịch vụ CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -91,13 +90,11 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 // Kích hoạt CORS middleware
-app.UseCors("AllowAll"); // Sử dụng policy "AllowAll"
+app.UseCors("AllowAll"); 
 
-// Middleware Authentication và Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Sử dụng Swagger trong môi trường phát triển
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
