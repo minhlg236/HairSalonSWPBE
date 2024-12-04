@@ -122,30 +122,28 @@ namespace hair_harmony_be.controller
 
         [HttpGet("getAll")]
         [Authorize(Policy = "staff")]
-        public async Task<IActionResult> GetAllPaymentTransactions(
-    [FromQuery] bool? status = true,          // Lọc theo status (mặc định là true)
-    [FromQuery] int? stylistId = null,        // Lọc theo stylistId (nếu có)
-    [FromQuery] DateTime? startTimeFrom = null, // Lọc theo starttime bắt đầu của booking (nếu có)
-    [FromQuery] DateTime? startTimeTo = null,   // Lọc theo starttime kết thúc của booking (nếu có)
-    [FromQuery] int page = 1,                 // Số trang (mặc định là 1)
-    [FromQuery] int size = 10                 // Số bản ghi mỗi trang (mặc định là 10)
+        public async Task<IActionResult> GetAllPaymentTransactionsForStaffManager(
+    [FromQuery] int? stylistId = null,
+    [FromQuery] DateTime? startTimeFrom = null,
+    [FromQuery] DateTime? startTimeTo = null,
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 10,
+    [FromQuery] string bookingStatus = null // Thêm filter theo Booking.Status
 )
         {
-            // Bắt đầu truy vấn từ PaymentTransactions
             var query = _context.PaymentTransactions
                 .Include(pt => pt.Stylist)
                 .Include(pt => pt.Booking)
+                .ThenInclude(b => b.Service)
                 .Include(pt => pt.CreatedBy)
                 .Include(pt => pt.UpdatedBy)
-                .Where(pt => pt.Status == status);  // Lọc theo status (mặc định true)
+                .Where(pt => pt.Status == true);
 
-            // Lọc theo stylistId nếu có
             if (stylistId.HasValue)
             {
                 query = query.Where(pt => pt.Stylist.Id == stylistId.Value);
             }
 
-            // Lọc theo starttime của booking nếu có
             if (startTimeFrom.HasValue && startTimeTo.HasValue)
             {
                 query = query.Where(pt => pt.Booking.StartTime >= startTimeFrom.Value && pt.Booking.StartTime <= startTimeTo.Value);
@@ -159,29 +157,190 @@ namespace hair_harmony_be.controller
                 query = query.Where(pt => pt.Booking.StartTime <= startTimeTo.Value);
             }
 
-            // Lấy tổng số lượng bản ghi
-            var totalRecords = await query.CountAsync();
-
-            // Phân trang
-            var paymentTransactions = await query
-                .Skip((page - 1) * size)  // Bỏ qua các bản ghi trước đó
-                .Take(size)               // Lấy số bản ghi theo kích thước trang
-                .ToListAsync();
-
-            // Kiểm tra nếu không có kết quả
-            if (paymentTransactions == null || !paymentTransactions.Any())
+            if (!string.IsNullOrEmpty(bookingStatus))
             {
-                return NotFound("No payment transactions found.");
+                query = query.Where(pt => pt.Booking.Status == bookingStatus);
             }
 
-            // Trả về kết quả cùng thông tin phân trang
+            var totalRecords = await query.CountAsync();
+
+            var paymentTransactions = await query
+                .OrderBy(pt => pt.Booking.Status == "booked" ? 1
+                             : pt.Booking.Status == "confirmed" ? 2
+                             : pt.Booking.Status == "check-in" ? 3
+                             : pt.Booking.Status == "paid" ? 4
+                             : 5)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            // Nếu không có dữ liệu, vẫn trả về danh sách rỗng
+            var result = paymentTransactions.Select(pt =>
+            {
+                var servicePrice = pt.Booking?.Service?.Price ?? 0;
+                var bookingId = pt.Booking?.Id ?? 0;
+
+                var paymentCount = _context.PaymentTransactions
+                    .Count(pt => pt.Booking.Id == bookingId);
+
+                var totalPrice = pt.Booking?.Status == "paid"
+                    ? servicePrice * 0.7 / (paymentCount > 0 ? paymentCount : 1)
+                    : 0;
+
+                return new PaymentTransactionDTO
+                {
+                    Id = pt.Id,
+                    Note = pt.Note,
+                    Stylist = pt.Stylist,
+                    Booking = pt.Booking,
+                    Service = pt.Booking.Service,
+                    TotalPrice = totalPrice,
+                };
+            }).ToList();
+
             return Ok(new
             {
                 TotalRecords = totalRecords,
                 TotalPages = (int)Math.Ceiling((double)totalRecords / size),
                 CurrentPage = page,
-                PaymentTransactions = paymentTransactions
+                PaymentTransactions = result ?? new List<PaymentTransactionDTO>() // Đảm bảo trả về danh sách rỗng nếu không có dữ liệu
             });
+        }
+
+
+
+
+
+        // dùng khi stylist check lịch làm của mình
+        [HttpGet("filterByStylistAndService")]
+        [Authorize(Policy = "stylist")]
+        public async Task<IActionResult> FilterPaymentTransactions(
+    [FromQuery] int? serviceId = null,
+    [FromQuery] DateTime? startTimeFrom = null,
+    [FromQuery] DateTime? startTimeTo = null,
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 10
+)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
+            }
+
+            var stylistId = int.Parse(userIdClaim.Value);
+
+            var query = _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                .ThenInclude(b => b.Service)
+                .Where(pt => pt.Stylist.Id == stylistId)
+                .Where(pt => pt.Status == true);
+
+
+            if (serviceId.HasValue)
+            {
+                query = query.Where(pt => pt.Booking.Service.Id == serviceId.Value);
+            }
+
+            if (startTimeFrom.HasValue && startTimeTo.HasValue)
+            {
+                query = query.Where(pt => pt.Booking.StartTime >= startTimeFrom.Value && pt.Booking.StartTime <= startTimeTo.Value);
+            }
+            else if (startTimeFrom.HasValue)
+            {
+                query = query.Where(pt => pt.Booking.StartTime >= startTimeFrom.Value);
+            }
+            else if (startTimeTo.HasValue)
+            {
+                query = query.Where(pt => pt.Booking.StartTime <= startTimeTo.Value);
+            }
+
+            query = query.OrderBy(pt => pt.Booking.Status == "booked" ? 1
+                             : pt.Booking.Status == "confirmed" ? 2
+                             : pt.Booking.Status == "check-in" ? 3
+                             : pt.Booking.Status == "paid" ? 4
+                             : 5);
+
+            var totalRecords = await query.CountAsync();
+
+            var paymentTransactions = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            var result = paymentTransactions.Select(pt =>
+            {
+                var servicePrice = pt.Booking?.Service?.Price ?? 0;
+                var bookingId = pt.Booking?.Id ?? 0;
+
+                var paymentCount = _context.PaymentTransactions
+                    .Count(pt => pt.Booking.Id == bookingId);
+
+                var totalPrice = pt.Booking?.Status == "paid"
+                    ? servicePrice * 0.7 / (paymentCount > 0 ? paymentCount : 1)
+                    : 0;
+
+                return new PaymentTransactionDTO
+                {
+                    Id = pt.Id,
+                    Note = pt.Note,
+                    Stylist = pt.Stylist,
+                    Booking = pt.Booking,
+                    Service = pt.Booking.Service,
+                    TotalPrice = totalPrice
+                };
+            }).ToList();
+
+            return Ok(new
+            {
+                TotalRecords = totalRecords,
+                TotalPages = (int)Math.Ceiling((double)totalRecords / size),
+                CurrentPage = page,
+                PaymentTransactions = result
+            });
+        }
+
+
+
+
+        [HttpPut("deletePayment/{id}")]     // thực chất chỉ đổi status
+        [Authorize(Policy = "staff")]
+        public async Task<IActionResult> UpdatePaymentTransactionStatus(int id, [FromBody] UpdatePaymentStatusRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+            var updater = await _context.Users.FindAsync(userId);
+            if (updater == null)
+            {
+                return Unauthorized(new { message = "User not found" });
+            }
+
+            var paymentTransaction = await _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                .FirstOrDefaultAsync(pt => pt.Id == id);
+
+            if (paymentTransaction == null) return NotFound("PaymentTransaction not found");
+
+            // Chỉ cập nhật status
+            if (request.Status.HasValue)
+            {
+                paymentTransaction.Status = request.Status.Value;
+            }
+
+            paymentTransaction.UpdatedBy = updater;
+            paymentTransaction.UpdatedOn = DateTime.Now;
+
+            _context.PaymentTransactions.Update(paymentTransaction);
+            await _context.SaveChangesAsync();
+
+            return Ok(paymentTransaction);
         }
 
 

@@ -218,7 +218,7 @@ namespace hair_harmony_be.controller
         [HttpPost("create-user")]
         public async Task<IActionResult> CreateUser([FromBody] RegisterRequest request)
         {
-            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName && u.Status == true))
             {
                 return BadRequest("Tên đăng nhập đã tồn tại.");
             }
@@ -257,7 +257,7 @@ namespace hair_harmony_be.controller
         [Authorize(Policy = "admin")]
         public async Task<IActionResult> RegisterStaff([FromBody] RegisterRequest request)
         {
-            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+            if (await _context.Users.AnyAsync(u => u.UserName == request.UserName && u.Status == true))
             {
                 return BadRequest("Tên đăng nhập đã tồn tại.");
             }
@@ -288,6 +288,145 @@ namespace hair_harmony_be.controller
 
             return Ok("Đăng ký tài khoản staff thành công.");
         }
+
+
+        [HttpGet("getAllUsers")]
+        [Authorize(Policy = "admin")]
+        public async Task<IActionResult> GetAllUsers(
+    [FromQuery] string? name = null,
+    [FromQuery] string? username = null,
+    [FromQuery] string? role = null)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Không xác định được người dùng.");
+            }
+
+            var query = _context.Users.Include(u => u.Role).Where(u => u.Id.ToString() != userId);
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(u => u.FullName.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(u => u.UserName.Contains(username));
+            }
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                query = query.Where(u => u.Role.Title.Contains(role));
+            }
+
+            var users = await query.ToListAsync();
+
+            return Ok(users.Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.FullName,
+                Role = u.Role?.Title ?? "Unknown",
+                u.Status,
+                u.CreatedOn,
+                u.UpdatedOn
+            }));
+        }
+
+        [HttpGet("getAllStylists")]
+        [Authorize(Policy = "staff")]
+        public async Task<IActionResult> GetAllStylists() // dành cho staff add payment transaction
+        {
+            var stylists = await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Role.Title == "stylist")
+                .ToListAsync();
+
+            if (stylists == null || !stylists.Any())
+            {
+                return NotFound("Không có stylist nào.");
+            }
+
+            return Ok(stylists.Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.FullName,
+                Role = u.Role?.Title ?? "Unknown",
+                u.Status,
+                u.CreatedOn,
+                u.UpdatedOn
+            }));
+        }
+
+
+        [HttpPut("updateUser")]
+        [Authorize]
+        public async Task<IActionResult> UpdateOwnUser([FromBody] UpdateUserRequest request)
+        {
+            // Get userId from the token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Không xác định được người dùng.");
+            }
+
+            // Find the user by ID
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+            if (user == null)
+            {
+                return NotFound("Người dùng không tồn tại.");
+            }
+
+            // Update user's information
+            user.FullName = request.FullName ?? user.FullName;
+            user.Email = request.Email ?? user.Email;
+            user.Gender = request.Gender ?? user.Gender;
+            user.Dob = request.Dob ?? user.Dob;
+            user.Address = request.Address ?? user.Address;
+
+            user.UpdatedOn = DateTime.UtcNow;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("Cập nhật thông tin người dùng thành công.");
+        }
+
+        [HttpPut("updateUserRole")]
+        [Authorize(Policy = "admin")]
+        public async Task<IActionResult> UpdateUserRole([FromBody] UpdateUserRoleRequest request)
+        {
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+            if (user == null)
+            {
+                return NotFound("Người dùng không tồn tại.");
+            }
+
+            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == request.RoleId);
+
+            if (role == null)
+            {
+                return BadRequest("Role không tồn tại.");
+            }
+
+            // Update user's role
+            user.Role = role;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("Cập nhật role người dùng thành công.");
+        }
+
+
+
+
+
     }
 
 }

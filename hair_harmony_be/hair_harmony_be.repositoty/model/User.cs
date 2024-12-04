@@ -40,4 +40,20 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
         public string? Address { get; set; }
     }
 
+    public class UpdateUserRequest
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public bool? Gender { get; set; }
+        public DateTime? Dob { get; set; }
+        public string Address { get; set; }
+    }
+
+    public class UpdateUserRoleRequest
+    {
+        public int UserId { get; set; }  
+        public int RoleId { get; set; }  
+    }
+
+
 }

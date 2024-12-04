@@ -11,18 +11,6 @@
         public DateTime UpdatedOn { get; set; }
         public bool Status { get; set; }
     }
-    public class ImageCreateRequest
-    {
-        public string Url { get; set; }
-        public int StyleId { get; set; }
-    }
-
-    public class ImageCreateRequestDTO
-    {
-        public string Url { get; set; }
-        public int StyleId { get; set; }
-        public int CreatedBy { get; set; }
-        public int UpdatedBy { get; set; }
-    }
+    
 
 }

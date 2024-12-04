@@ -27,5 +27,19 @@
         public bool? Status { get; set; }
     }
 
+    public class PaymentTransactionDTO
+    {
+        public int Id { get; set; }
+        public string Note { get; set; }
+        public User Stylist { get; set; }
+        public Booking Booking { get; set; }
+        public Service Service { get; set; }
+        public double TotalPrice { get; set; }
+    }
+
+    public class UpdatePaymentStatusRequest
+    {
+        public bool? Status { get; set; }
+    }
 
 }

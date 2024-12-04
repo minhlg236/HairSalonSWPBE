@@ -125,20 +125,16 @@ namespace hair_harmony_be.controller
                 .Take(pageSize)
                 .ToListAsync();
 
-            if (!bookings.Any())
-            {
-                return NotFound(new { message = "No bookings found for the specified user." });
-            }
-
             return Ok(new PagedResult<Booking>
             {
-                Items = bookings,
+                Items = bookings,  
                 TotalCount = totalCount,
                 TotalPages = totalPages,
                 CurrentPage = page,
                 PageSize = pageSize
             });
         }
+
 
 
         [HttpPut("{id}")]
@@ -240,11 +236,11 @@ namespace hair_harmony_be.controller
         [HttpGet("listAll")]
         [Authorize(Policy = "staff")]
         public async Task<IActionResult> GetAll(
-    int page = 1,
-    int pageSize = 10,
-    string? status = "booked",
-    DateTime? startTimeFrom = null,
-    DateTime? startTimeTo = null)
+      int page = 1,
+      int pageSize = 10,
+      string? status = "booked",
+      DateTime? startTimeFrom = null,
+      DateTime? startTimeTo = null)
         {
             if (page <= 0 || pageSize <= 0)
             {
@@ -255,8 +251,8 @@ namespace hair_harmony_be.controller
 
             var bookingsQuery = _context.Bookings
                 .Include(b => b.Service)
-                .Include(b => b.CreatedBy).Where(b => b.Status == status);
-
+                .Include(b => b.CreatedBy)
+                .Where(b => b.Status == status);
 
             if (startTimeFrom.HasValue)
             {
@@ -276,11 +272,6 @@ namespace hair_harmony_be.controller
                 .Take(pageSize)
                 .ToListAsync();
 
-            if (!bookings.Any())
-            {
-                return NotFound(new { message = "No bookings found for the specified filters." });
-            }
-
             return Ok(new PagedResult<Booking>
             {
                 Items = bookings,
@@ -290,6 +281,7 @@ namespace hair_harmony_be.controller
                 PageSize = pageSize
             });
         }
+
 
 
     }

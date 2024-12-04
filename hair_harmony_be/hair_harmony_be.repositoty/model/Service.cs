@@ -16,15 +16,27 @@
 
     }
 
-    public class StyleCreateRequest
+    public class ServiceCreateRequest
     {
         public string Title { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }
         public double? Discount { get; set; }
+        public double? TimeService { get; set; }
+
+
+    }
+
+    public class ServiceUpdateRequest
+    {
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public double? Price { get; set; }
+        public double? Discount { get; set; }
         public double? Commission { get; set; }
         public double? TimeService { get; set; }
 
+        public bool? Status { get; set; }
 
     }
 
