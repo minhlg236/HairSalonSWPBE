@@ -42,4 +42,11 @@
         public bool? Status { get; set; }
     }
 
+    public class AvailableTimeRequest
+    {
+        public List<DateTime> ListTime { get; set; } 
+        public double TimeService { get; set; } 
+    }
+
+
 }

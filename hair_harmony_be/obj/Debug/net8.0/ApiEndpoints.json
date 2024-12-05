@@ -257,6 +257,22 @@
   },
   {
     "ContainingType": "hair_harmony_be.controller.PaymentTransactionController",
+    "Method": "GetAvailableTimeIndexes",
+    "RelativePath": "api/PaymentTransaction/availableTimeIndexes",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.AvailableTimeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "hair_harmony_be.controller.PaymentTransactionController",
     "Method": "CreatePaymentTransaction",
     "RelativePath": "api/PaymentTransaction/create",
     "HttpMethod": "POST",
@@ -443,43 +459,6 @@
   },
   {
     "ContainingType": "hair_harmony_be.Controllers.RoleController",
-    "Method": "UpdateRole",
-    "RelativePath": "api/Role/{id}",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "role",
-        "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.Role",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "hair_harmony_be.Controllers.RoleController",
-    "Method": "DeleteRole",
-    "RelativePath": "api/Role/{id}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "hair_harmony_be.Controllers.RoleController",
     "Method": "GetAllRoles",
     "RelativePath": "api/Role/all",
     "HttpMethod": "GET",
@@ -497,6 +476,43 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "hair_harmony_be.Controllers.RoleController",
+    "Method": "DeleteRole",
+    "RelativePath": "api/Role/delete/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "hair_harmony_be.Controllers.RoleController",
+    "Method": "UpdateRole",
+    "RelativePath": "api/Role/update/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "role",
+        "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.Role",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "hair_harmony_be.controller.ServiceController",
@@ -544,6 +560,16 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "hair_harmony_be.controller.ServiceController",
+    "Method": "GetAllServicesNotPaging",
+    "RelativePath": "api/Service/getAllServices-not-paging",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "hair_harmony_be.controller.ServiceController",

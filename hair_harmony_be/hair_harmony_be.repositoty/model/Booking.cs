@@ -9,7 +9,7 @@
         public DateTime UpdatedOn { get; set; } = DateTime.Now; 
         public User CreatedBy { get; set; }
         public string Status { get; set; } = "booked";
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
     }
 

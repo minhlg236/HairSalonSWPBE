@@ -37,7 +37,7 @@ namespace hair_harmony_be.controller
             var booking = await _context.Bookings.FindAsync(request.BookingId);
             if (booking == null) return NotFound("Booking not found");
 
-         
+
             var paymentTransaction = new PaymentTransaction
             {
                 Note = request.Note,
@@ -342,6 +342,46 @@ namespace hair_harmony_be.controller
 
             return Ok(paymentTransaction);
         }
+
+
+        [HttpPost("availableTimeIndexes")]
+        [Authorize(Policy = "staff")]
+        public async Task<IActionResult> GetAvailableTimeIndexes([FromBody] AvailableTimeRequest request)
+        {
+            var busyStylistsQuery = _context.Bookings
+                .Include(b => b.Service) 
+                .Include(b => b.CreatedBy) 
+                .Where(b => b.Status == "booked" || b.Status == "confirmed" || b.Status == "check-in")
+                .Select(b => new
+                {
+                    StylistId = b.CreatedBy.Id,
+                    StartTime = b.StartTime,
+                    EndTime = b.StartTime.AddMinutes(b.Service.TimeService.HasValue ? b.Service.TimeService.Value * 60 : 0) 
+                });
+
+            var busyStylists = await busyStylistsQuery.ToListAsync();
+
+          
+            var resultIndexes = new List<int>();
+
+            for (int i = 0; i < request.ListTime.Count; i++)
+            {
+                var timeSlot = request.ListTime[i];
+                var timeSlotEnd = timeSlot.AddMinutes(request.TimeService * 60);
+
+            
+                var isAvailable = !busyStylists.Any(b =>
+                    b.StartTime < timeSlotEnd && b.EndTime > timeSlot); 
+
+                if (isAvailable)
+                {
+                    resultIndexes.Add(i);
+                }
+            }
+
+            return Ok(resultIndexes);
+        }
+
 
 
 
