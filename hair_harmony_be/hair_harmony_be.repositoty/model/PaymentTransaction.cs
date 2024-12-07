@@ -44,8 +44,8 @@
 
     public class AvailableTimeRequest
     {
-        public List<DateTime> ListTime { get; set; } 
-        public double TimeService { get; set; } 
+        public List<String> ListTime { get; set; } 
+        public DateTime Date { get; set; } 
     }
 
 

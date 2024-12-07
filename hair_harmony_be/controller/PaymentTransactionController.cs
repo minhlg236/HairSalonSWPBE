@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace hair_harmony_be.controller
 {
@@ -343,39 +344,68 @@ namespace hair_harmony_be.controller
             return Ok(paymentTransaction);
         }
 
-
-        [HttpPost("availableTimeIndexes")]
+        [HttpPost("availableTimeIndexes")]    // api này dùng để check thời gian không thể booking của 1 service ,,,
         [Authorize(Policy = "staff")]
-        public async Task<IActionResult> GetAvailableTimeIndexes([FromBody] AvailableTimeRequest request)
+        public async Task<IActionResult> GetUnavailableTimeIndexes([FromBody] AvailableTimeRequest request)
         {
-            var busyStylistsQuery = _context.Bookings
-                .Include(b => b.Service) 
-                .Include(b => b.CreatedBy) 
-                .Where(b => b.Status == "booked" || b.Status == "confirmed" || b.Status == "check-in")
-                .Select(b => new
+            var inputDate = request.Date.Date;
+
+            var allStylists = await _context.Users
+                .Where(u => u.Role.Title == "stylist")
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            var busyStylistsQuery = _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                    .ThenInclude(b => b.Service)
+                .Where(pt => pt.Stylist.Role.Title == "stylist" &&
+                             pt.Booking.StartTime.Date == inputDate &&
+                             (pt.Booking.Status == "booked" ||
+                              pt.Booking.Status == "confirmed" ||
+                              pt.Booking.Status == "check-in"))
+                .Select(pt => new
                 {
-                    StylistId = b.CreatedBy.Id,
-                    StartTime = b.StartTime,
-                    EndTime = b.StartTime.AddMinutes(b.Service.TimeService.HasValue ? b.Service.TimeService.Value * 60 : 0) 
+                    StylistId = pt.Stylist.Id,
+                    StartTime = pt.Booking.StartTime,
+                    EndTime = pt.Booking.StartTime.AddMinutes(pt.Booking.Service.TimeService.HasValue
+                                ? pt.Booking.Service.TimeService.Value * 60
+                                : 0)
                 });
 
             var busyStylists = await busyStylistsQuery.ToListAsync();
 
-          
             var resultIndexes = new List<int>();
 
             for (int i = 0; i < request.ListTime.Count; i++)
             {
-                var timeSlot = request.ListTime[i];
-                var timeSlotEnd = timeSlot.AddMinutes(request.TimeService * 60);
-
-            
-                var isAvailable = !busyStylists.Any(b =>
-                    b.StartTime < timeSlotEnd && b.EndTime > timeSlot); 
-
-                if (isAvailable)
+                try
                 {
-                    resultIndexes.Add(i);
+                    var timeRange = request.ListTime[i].Split("-");
+                    if (timeRange.Length != 2)
+                    {
+                        return BadRequest(new { error = $"Invalid time format for entry {request.ListTime[i]}" });
+                    }
+
+                    var startTime = DateTime.ParseExact($"{inputDate:yyyy-MM-dd} {timeRange[0]}",
+                        "yyyy-MM-dd H:mm", null);
+                    var endTime = DateTime.ParseExact($"{inputDate:yyyy-MM-dd} {timeRange[1]}",
+                        "yyyy-MM-dd H:mm", null);
+
+                    var unavailableStylistCount = busyStylists
+                        .Where(b => b.StartTime < endTime && b.EndTime > startTime)
+                        .Select(b => b.StylistId)
+                        .Distinct()
+                        .Count();
+
+                    if (unavailableStylistCount == allStylists.Count)
+                    {
+                        resultIndexes.Add(i);
+                    }
+                }
+                catch (FormatException ex)
+                {
+                    return BadRequest(new { error = $"Invalid time format: {ex.Message}" });
                 }
             }
 

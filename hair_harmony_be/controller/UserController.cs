@@ -330,7 +330,10 @@ namespace hair_harmony_be.controller
                 Role = u.Role?.Title ?? "Unknown",
                 u.Status,
                 u.CreatedOn,
-                u.UpdatedOn
+                u.UpdatedOn,
+                u.Address,
+                u.Email,
+                u.Dob                
             }));
         }
 
@@ -356,7 +359,10 @@ namespace hair_harmony_be.controller
                 Role = u.Role?.Title ?? "Unknown",
                 u.Status,
                 u.CreatedOn,
-                u.UpdatedOn
+                u.UpdatedOn,
+                u.Address,
+                u.Email,
+                u.Dob
             }));
         }
 

@@ -257,7 +257,7 @@
   },
   {
     "ContainingType": "hair_harmony_be.controller.PaymentTransactionController",
-    "Method": "GetAvailableTimeIndexes",
+    "Method": "GetUnavailableTimeIndexes",
     "RelativePath": "api/PaymentTransaction/availableTimeIndexes",
     "HttpMethod": "POST",
     "IsController": true,
