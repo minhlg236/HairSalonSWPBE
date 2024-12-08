@@ -345,7 +345,6 @@ namespace hair_harmony_be.controller
         }
 
         [HttpPost("availableTimeIndexes")]    // api này dùng để check thời gian không thể booking của 1 service ,,,
-        [Authorize(Policy = "staff")]
         public async Task<IActionResult> GetUnavailableTimeIndexes([FromBody] AvailableTimeRequest request)
         {
             var inputDate = request.Date.Date;
