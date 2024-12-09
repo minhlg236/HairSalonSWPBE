@@ -11,6 +11,12 @@
         public DateTime UpdatedOn { get; set; }
         public bool Status { get; set; }
     }
-    
+
+    public class ImageAddDTO
+    {
+        public string Url { get; set; }
+        public int serviceId { get; set; }
+    }
+   
 
 }

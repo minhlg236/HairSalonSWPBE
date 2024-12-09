@@ -3,7 +3,27 @@
   "WorkspaceRootPath": "D:\\project_thue\\HairSalonSWPBE\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|d:\\project_thue\\hairsalonswpbe\\hair_harmony_be\\controller\\paymenttransactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|d:\\project_thue\\hairsalonswpbe\\hair_harmony_be\\controller\\imagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\imagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\servicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\servicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\image.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\model\\image.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\imagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\imagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\paymenttransactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\paymenttransactioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -23,20 +43,8 @@
       "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\imagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\imagerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\servicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\servicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\model\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\imagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\imagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -55,14 +63,6 @@
       "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\model\\refreshtokenrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\image.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\hair_harmony_be.repositoty\\model\\image.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E7C261F9-9D80-46FA-BEC2-A77CA1E3859C}|hair_harmony_be\\hair_harmony_be.csproj|solutionrelative:hair_harmony_be\\controller\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -74,29 +74,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 15,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 0,
               "Title": "ImageController.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\ImageController.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\controller\\ImageController.cs",
               "ToolTip": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\ImageController.cs",
               "RelativeToolTip": "hair_harmony_be\\controller\\ImageController.cs",
-              "ViewState": "AQIAADcAAAAAAAAAAAAuwFoAAAAAAAAA",
+              "ViewState": "AQIAAG0AAAAAAAAAAAAcwBgAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-04T16:17:56.918Z"
+              "WhenOpened": "2024-12-04T16:17:56.918Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "ImageRepository.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\ImageRepository.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\ImageRepository.cs",
               "ToolTip": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\ImageRepository.cs",
               "RelativeToolTip": "hair_harmony_be\\hair_harmony_be.repositoty\\ImageRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAACoAAAAuAAAA",
+              "ViewState": "AQIAABEAAAAAAAAAAAAcwDIAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-04T16:17:03.759Z"
             },
@@ -114,19 +115,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 4,
               "Title": "BookingController.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\BookingController.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\controller\\BookingController.cs",
               "ToolTip": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\BookingController.cs",
               "RelativeToolTip": "hair_harmony_be\\controller\\BookingController.cs",
-              "ViewState": "AQIAAO8AAAAAAAAAAAAcwBIBAAAtAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAA1AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-30T05:59:39.79Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "Booking.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\Booking.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\Booking.cs",
@@ -138,31 +139,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "ServiceController.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\ServiceController.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\controller\\ServiceController.cs",
               "ToolTip": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\ServiceController.cs",
               "RelativeToolTip": "hair_harmony_be\\controller\\ServiceController.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAABMAAAA",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAowFEAAAAlAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-28T16:30:30.691Z"
+              "WhenOpened": "2024-11-28T16:30:30.691Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 2,
               "Title": "Image.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\Image.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\Image.cs",
               "ToolTip": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\Image.cs",
               "RelativeToolTip": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\Image.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAWAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-28T16:29:00.483Z"
+              "WhenOpened": "2024-11-28T16:29:00.483Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "RefreshTokenRequest.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\RefreshTokenRequest.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\RefreshTokenRequest.cs",
@@ -174,7 +177,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "Service.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\Service.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\Service.cs",
@@ -186,7 +189,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 13,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\Program.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\Program.cs",
@@ -198,7 +201,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "Role.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\Role.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\Role.cs",
@@ -210,7 +213,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "User.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\User.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\User.cs",
@@ -222,7 +225,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.data\\AppDbContext.cs",
@@ -234,7 +237,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "UserController.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\UserController.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\controller\\UserController.cs",
@@ -246,7 +249,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "PaymentTransaction.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\hair_harmony_be.repositoty\\model\\PaymentTransaction.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\hair_harmony_be.repositoty\\model\\PaymentTransaction.cs",
@@ -258,7 +261,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "PaymentTransactionController.cs",
               "DocumentMoniker": "D:\\project_thue\\HairSalonSWPBE\\hair_harmony_be\\controller\\PaymentTransactionController.cs",
               "RelativeDocumentMoniker": "hair_harmony_be\\controller\\PaymentTransactionController.cs",
@@ -266,8 +269,7 @@
               "RelativeToolTip": "hair_harmony_be\\controller\\PaymentTransactionController.cs",
               "ViewState": "AQIAAEYBAAAAAAAAAAAAwFsBAAASAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-30T07:24:59.123Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-30T07:24:59.123Z"
             }
           ]
         }

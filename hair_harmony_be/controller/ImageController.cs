@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using hair_harmony_be.hair_harmony_be.repositoty.model;
-using hair_harmony_be.hair_harmony_be.Repositories;
+﻿using hair_harmony_be.hair_harmony_be.repositoty.model;
+using HairSalon.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace hair_harmony_be.hair_harmony_be.Controllers
@@ -11,24 +15,29 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
-        private readonly ImageRepository _imageRepository;
+        private readonly AppDbContext _context;
 
-        public ImageController(ImageRepository imageRepository)
+        public ImageController(AppDbContext context)
         {
-            _imageRepository = imageRepository;
+            _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("getAll")]
         public async Task<ActionResult<IEnumerable<Image>>> GetImages()
         {
-            var images = await _imageRepository.GetAllImagesAsync();
+            var images = await _context.Images
+                .Include(i => i.ServiceEntity)
+                .ToListAsync();
+
             return Ok(images);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Image>> GetImage(int id)
         {
-            var image = await _imageRepository.GetImageByIdAsync(id);
+            var image = await _context.Images
+                .Include(i => i.ServiceEntity)
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (image == null)
             {
@@ -38,53 +47,95 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
             return Ok(image);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Image>> PostImage(Image image)
+        [HttpPost ("add")]
+        [Authorize(Policy = "staff")]
+        public async Task<ActionResult<Image>> PostImage(ImageAddDTO imageDto)
         {
-            if (image == null)
+            if (imageDto == null)
             {
                 return BadRequest("Image data is required");
             }
 
-            image.CreatedOn = DateTime.UtcNow;
-            image.UpdatedOn = DateTime.UtcNow;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
+            }
 
-            await _imageRepository.AddImageAsync(image);
+            var userId = int.Parse(userIdClaim.Value);
+
+            var service = await _context.Services.FirstOrDefaultAsync(s => s.Id == imageDto.serviceId);
+            if (service == null)
+            {
+                return NotFound($"Service with ID {imageDto.serviceId} not found.");
+            }
+
+            var image = new Image
+            {
+                Url = imageDto.Url,
+                ServiceEntity = service,
+                CreatedBy = userId,
+                UpdatedBy = userId,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
+                Status = true
+            };
+
+            await _context.Images.AddAsync(image);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetImage), new { id = image.Id }, image);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutImage(int id, Image image)
+        [HttpPut("update/{id}")]
+        [Authorize(Policy = "staff")]
+        public async Task<IActionResult> PutImage(int id, ImageAddDTO imageDto)
         {
-            if (id != image.Id)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
             {
-                return BadRequest();
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
             }
 
-            var existingImage = await _imageRepository.GetImageByIdAsync(id);
+            var userId = int.Parse(userIdClaim.Value);
+
+            var existingImage = await _context.Images.Include(i => i.ServiceEntity).FirstOrDefaultAsync(i => i.Id == id);
             if (existingImage == null)
             {
-                return NotFound();
+                return NotFound($"Image with ID {id} not found.");
             }
 
-            image.UpdatedOn = DateTime.UtcNow;
+            var service = await _context.Services.FirstOrDefaultAsync(s => s.Id == imageDto.serviceId);
+            if (service == null)
+            {
+                return NotFound($"Service with ID {imageDto.serviceId} not found.");
+            }
 
-            await _imageRepository.UpdateImageAsync(image);
-            return NoContent();
+            existingImage.Url = imageDto.Url;
+            existingImage.ServiceEntity = service;
+            existingImage.UpdatedBy = userId;
+            existingImage.UpdatedOn = DateTime.UtcNow;
+
+            _context.Images.Update(existingImage);
+            await _context.SaveChangesAsync();
+
+            return Ok(existingImage);
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "staff")]
         public async Task<IActionResult> DeleteImage(int id)
         {
-            var image = await _imageRepository.GetImageByIdAsync(id);
+            var image = await _context.Images.FirstOrDefaultAsync(i => i.Id == id);
             if (image == null)
             {
                 return NotFound();
             }
 
-            await _imageRepository.DeleteImageAsync(id);
-            return NoContent();
+            _context.Images.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

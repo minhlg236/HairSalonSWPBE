@@ -1,5 +1,6 @@
 ﻿using hair_harmony_be.hair_harmony_be.repositoty.model;
 using HairSalon.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace hair_harmony_be.hair_harmony_be.Repositories
@@ -28,6 +29,7 @@ namespace hair_harmony_be.hair_harmony_be.Repositories
             await _context.Images.AddAsync(image);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task UpdateImageAsync(Image image)
         {
