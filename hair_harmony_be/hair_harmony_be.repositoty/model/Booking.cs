@@ -30,5 +30,11 @@
         public string? Note { get; set; }
 
     }
+    public class BookingCreateForServiceRequest
+    {
+        public int ServiceId { get; set; } 
+        public List<string> StartTimes { get; set; }
+        public string? Note { get; set; } 
+    }
 
 }

@@ -113,7 +113,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
             {
                 return NotFound();
             }
-            category.Status = true;
+            category.Status = false;
             _context.CategoryServices.Update(category);
             await _context.SaveChangesAsync();
 

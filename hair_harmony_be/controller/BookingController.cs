@@ -140,6 +140,7 @@ namespace hair_harmony_be.controller
 
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateBooking(int id, [FromBody] BookingUpdateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -165,37 +166,50 @@ namespace hair_harmony_be.controller
 
             var isUser = User.IsInRole("user");
             var isStaff = User.IsInRole("staff");
-                if (isUser)
-            {
-                if (!string.IsNullOrWhiteSpace(request.Status))
-                {
-                    if (booking.Status == "booked" && request.Status != "rejected")
+                if (isUser){
+                    if (!string.IsNullOrWhiteSpace(request.Status))
                     {
-                        return BadRequest(new { message = "User can only update status from 'booked' to 'rejected'." });
-                    }
-                    if (booking.Status == "rejected" && request.Status != "booked")
-                    {
-                        return BadRequest(new { message = "User can only update status from 'rejected' to 'booked'." });
-                    }
+                        if (booking.Status == "booked" && request.Status != "rejected")
+                        {
+                            return BadRequest(new { message = "User can only update status from 'booked' to 'rejected'." });
+                        }
+                        if (booking.Status == "rejected" && request.Status != "booked")
+                        {
+                            return BadRequest(new { message = "User can only update status from 'rejected' to 'booked'." });
+                        }
 
-                    booking.Status = request.Status;
-                    }
+                        booking.Status = request.Status;
+                        }
                 }
 
                 if (isStaff)
                 {
                     if (!string.IsNullOrWhiteSpace(request.Status))
                     {
-                        if (booking.Status == "booked" && !(request.Status == "rejected" || request.Status == "confirmed" || request.Status == "check-in" || request.Status == "paid"))
+
+                    if (booking.Status == "booked" &&
+                      !new[] { "rejected", "confirmed" }.Contains(request.Status))
+                    {
+                        return BadRequest(new { message = "Staff can only update status from 'booked' to 'rejected' or 'confirmed'." });
+                    }
+                    if (booking.Status == "rejected" && ( request.Status != "confirmed"))
                         {
-                            return BadRequest(new { message = "Staff can only update status from 'booked' to 'rejected', 'confirmed', 'check-in', or 'paid'." });
+                            return BadRequest(new { message = "Staff can only update status from 'rejected' to 'confirmed'." });
                         }
-                        if (booking.Status == "paid" && request.Status == "paid")
+                        if (booking.Status == "confirmed" && (request.Status != "check-in"))
                         {
-                            return BadRequest(new { message = "Staff cannot update status from 'paid' to 'paid'." });
+                            return BadRequest(new { message = "Staff can only update status from 'confirmed' to 'check-in'." });
+                        }
+                        if (booking.Status == "check-in" && (request.Status != "paid"))
+                        {
+                            return BadRequest(new { message = "Staff can only update status from 'check-in' to 'paid'." });
+                        }
+                        if (booking.Status == "paid" && !string.IsNullOrEmpty(request.Status))
+                        {
+                            return BadRequest(new { message = "Can't update booking status when booking status was paid" });
                         }
 
-                        booking.Status = request.Status;
+                    booking.Status = request.Status;
                     }
 
 
@@ -285,6 +299,82 @@ namespace hair_harmony_be.controller
             });
         }
 
+        [HttpPost("create-multiple")]
+        [Authorize(Policy = "user")]
+        public async Task<IActionResult> CreateMultipleBookingsForService([FromBody] BookingCreateForServiceRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+            var creator = await _context.Users.FindAsync(userId);
+            if (creator == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+            if(request is null)
+            {
+                return BadRequest(new { message = "not found data input" });
+            }
+            var service = await _context.Services.FindAsync(request.ServiceId);
+            if (service == null)
+            {
+                return NotFound(new { message = "Service not found." });
+            }
+
+            var errors = new List<object>();
+            var createdBookings = new List<Booking>();
+
+            foreach (var startTimeString in request.StartTimes)
+            {
+                if (!DateTime.TryParse(startTimeString, out var startTime))
+                {
+                    errors.Add(new { StartTime = startTimeString, Message = "Invalid StartTime format. Use a valid DateTime string." });
+                    continue;
+                }
+
+                var existingBooking = await _context.Bookings
+                    .Where(b => b.CreatedBy.Id == userId &&
+                                b.Service.Id == request.ServiceId &&
+                                (b.Status == "booked" || b.Status == "confirmed"))
+
+                    .FirstOrDefaultAsync();
+
+                if (existingBooking != null)
+                {
+                    errors.Add(new { StartTime = startTimeString, Message = "A booking already exists with the same service and user." });
+                    continue;
+                }
+
+                var booking = new Booking
+                {
+                    StartTime = startTime,
+                    Service = service,
+                    CreatedBy = creator,
+                    CreatedOn = DateTime.Now,
+                    UpdatedOn = DateTime.Now,
+                    Status = "booked",
+                    Note = request.Note ?? ""
+                };
+
+                createdBookings.Add(booking);
+                _context.Bookings.Add(booking);
+            }
+
+            if (createdBookings.Count > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new
+            {
+                CreatedBookings = createdBookings.Select(b => new { b.Id, b.StartTime, b.Service, b.Status, b.Note }),
+                Errors = errors
+            });
+        }
 
 
     }

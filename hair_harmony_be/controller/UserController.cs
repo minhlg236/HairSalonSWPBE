@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
+using Azure.Core;
 
 
 namespace hair_harmony_be.controller
@@ -430,7 +431,45 @@ namespace hair_harmony_be.controller
         }
 
 
+        [HttpPut("sorfDelete/{id}")]
+        [Authorize(Policy = "admin")]
+        public async Task<IActionResult> SorfDelete(int id)
+        {
+            var userDeleted = await _context.Users.FirstOrDefaultAsync(r => r.Id == id && r.Status);
 
+            if (userDeleted == null)
+            {
+                return NotFound(new { message = "Không xác định được người xoá hoặc người dùng đã bị xoá." });
+            }
+
+            userDeleted.Status = false;
+            userDeleted.UpdatedOn = DateTime.UtcNow;
+
+            _context.Users.Update(userDeleted);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Người dùng đã bị xoá." });
+        }
+
+        [HttpPut("activeAccount/{id}")]
+        [Authorize(Policy = "admin")]
+        public async Task<IActionResult> ActiveAccount(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(r => r.Id == id);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "Không xác định được người dùng" });
+            }
+
+            user.Status = true;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Người dùng đã được mở lại." });
+        }
 
 
     }

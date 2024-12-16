@@ -18,7 +18,7 @@ namespace hair_harmony_be.controller
         }
 
         [HttpPost("create")]
-        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "AdminOrStaff")]
         public async Task<IActionResult> CreateService([FromBody] ServiceCreateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -29,11 +29,14 @@ namespace hair_harmony_be.controller
 
             var userId = int.Parse(userIdClaim.Value);
             var creator = await _context.Users.FindAsync(userId);
-            var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId);
+            var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId && s.Status == true);
             if (existingCategoryService == null)
             {
                 return NotFound(new { message = "Category Service not found." });
             }
+
+            request.Title = request.Title?.Trim() ?? ""; 
+            request.Description = request.Description?.Trim() ?? "";
 
             if (string.IsNullOrWhiteSpace(request.Title))
             {
@@ -46,10 +49,9 @@ namespace hair_harmony_be.controller
             double discount = 0.0;
             if (request.Discount.HasValue)
             {
-
                 discount = request.Discount.Value;
 
-                if (request.Discount.HasValue && request.Discount.Value < 0)
+                if (request.Discount.Value < 0)
                 {
                     return BadRequest(new { message = "Price must be greater than 0 when discount is applied." });
                 }
@@ -84,8 +86,9 @@ namespace hair_harmony_be.controller
             });
         }
 
+
         [HttpPut("update/{id}")]
-        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "AdminOrStaff")]
         public async Task<IActionResult> UpdateService(int id, [FromBody] ServiceUpdateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -97,19 +100,14 @@ namespace hair_harmony_be.controller
             var userId = int.Parse(userIdClaim.Value);
             var updateBy = await _context.Users.FindAsync(userId);
 
-            var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId);
-            if (existingCategoryService == null)
-            {
-                return NotFound(new { message = "Category Service not found." });
-            }
+           
 
 
-            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.Id == id);
+            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.Id == id && s.Status == true);
             if (existingService == null)
             {
                 return NotFound(new { message = "Service not found." });
             }
-            existingService.CategoryService = existingCategoryService;
 
             if (request is null || (request.Title == null && request.Description == null &&
                         !request.Price.HasValue && !request.TimeService.HasValue &&
@@ -117,7 +115,15 @@ namespace hair_harmony_be.controller
             {
                 return BadRequest(new { message = "At least one field must be provided for update." });
             }
-
+            if ((request.CategoryServiceId.HasValue))
+            {
+                var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId && s.Status == true);
+                if (existingCategoryService == null)
+                {
+                    return NotFound(new { message = "Category Service not found." });
+                }
+                existingService.CategoryService = existingCategoryService;
+            }
             if (!string.IsNullOrWhiteSpace(request.Title))
             {
                 existingService.Title = request.Title;
@@ -159,41 +165,51 @@ namespace hair_harmony_be.controller
 
 
         [HttpGet("getAll")]
-        public async Task<ActionResult<PagedResult<StyleWithImages>>> GetStylesWithImages(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<PagedResult<StyleWithImages>>> GetStylesWithImages(
+    int categoryServiceId,
+    string keyword = "",
+    int page = 1,
+    int pageSize = 10)
         {
             var skip = (page - 1) * pageSize;
 
-            var imagesGroupedByStyle = await _context.Images
-                .Where(i => i.Status && i.ServiceEntity != null)
-                .Include(i => i.ServiceEntity)
-                .ToListAsync();
+            var stylesQuery = _context.Services
+                .Where(s => s.Status && s.CategoryService != null &&
+                            s.CategoryService.Status &&
+                            s.CategoryService.Id == categoryServiceId);
 
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                stylesQuery = stylesQuery.Where(s =>
+                    s.Title.Contains(keyword) || s.Description.Contains(keyword) ||
+                    s.CategoryService.Title.Contains(keyword) || s.CategoryService.Description.Contains(keyword));
+            }
 
-            var groupedImages = imagesGroupedByStyle
-                .GroupBy(i => i.ServiceEntity.Id)
-                .ToList();
+            var totalCount = await stylesQuery.CountAsync();
 
-            var styles = await _context.Services
-                .Where(s => s.Status)
+            var styles = await stylesQuery
                 .Include(i => i.CategoryService)
-
                 .Skip(skip)
-            .Take(pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            var totalCount = await _context.Services.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            var styleIds = styles.Select(s => s.Id).ToList();
+            var imagesGroupedByStyle = await _context.Images
+                .Where(i => i.Status && i.ServiceEntity != null && styleIds.Contains(i.ServiceEntity.Id))
+                .GroupBy(i => i.ServiceEntity.Id)
+                .ToListAsync();
 
             var stylesWithImages = styles.Select(s => new StyleWithImages
             {
                 ServiceEnity = s,
-                Images = groupedImages
+                Images = imagesGroupedByStyle
                     .Where(g => g.Key == s.Id)
-                    .Select(g => g.ToList())
-                    .FirstOrDefault() ?? new List<Image>()
+                    .SelectMany(g => g.ToList())
+                    .ToList()
             }).ToList();
 
-            // Trả về kết quả phân trang
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
             return Ok(new PagedResult<StyleWithImages>
             {
                 Items = stylesWithImages,
@@ -204,18 +220,29 @@ namespace hair_harmony_be.controller
             });
         }
 
-        [HttpGet("getAllServices-not-paging")]
-        public async Task<IActionResult> GetAllServicesNotPaging() // dành cho việc hiển thị filter
+
+
+        [HttpGet("getAllServicesByCategoryId")]
+        public async Task<IActionResult> GetAllServicesByCategoryId([FromQuery] int categoryId) 
         {
-            var services = await _context.Services.ToListAsync();
+            if (categoryId <= 0)
+            {
+                return BadRequest("Invalid categoryId.");
+            }
+
+            var services = await _context.Services
+                .Include(s => s.CategoryService)
+                                         .Where(s => s.CategoryService.Id == categoryId && s.CategoryService.Status ) 
+                                         .ToListAsync();
 
             if (!services.Any())
             {
-                return Ok(new List<Service>());
+                return Ok(new List<Service>()); 
             }
 
             return Ok(services);
         }
+
 
 
         [HttpGet("detail/{serviceId}")]
@@ -223,6 +250,7 @@ namespace hair_harmony_be.controller
         {
             var service = await _context.Services
                 .Include(s => s.CategoryService)
+                .Where(s => s.CategoryService.Status )
                 .FirstOrDefaultAsync(s => s.Id == serviceId);
 
             if (service == null)

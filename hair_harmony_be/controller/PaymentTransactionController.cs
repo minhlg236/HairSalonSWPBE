@@ -32,12 +32,23 @@ namespace hair_harmony_be.controller
             var userId = int.Parse(userIdClaim.Value);
             var creator = await _context.Users.FindAsync(userId);
 
-            var stylist = await _context.Users.FindAsync(request.StylistId);
-            if (stylist == null) return NotFound("Stylist not found");
+            var stylist = await _context.Users   
+                .Include(pt => pt.Role)
+                .FirstOrDefaultAsync(pt => pt.Id == request.StylistId && pt.Role.Title == "stylist"); 
 
+            if (stylist == null) return NotFound("Stylist not found");
+           
             var booking = await _context.Bookings.FindAsync(request.BookingId);
             if (booking == null) return NotFound("Booking not found");
 
+            var paymentTransactionExist = await _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                .FirstOrDefaultAsync(pt => pt.Stylist.Id == request.StylistId && pt.Booking.Id == request.BookingId);
+            if (paymentTransactionExist != null)
+            {
+                return BadRequest(new { message = "This stylist was assgin for current service" });
+            }
 
             var paymentTransaction = new PaymentTransaction
             {
@@ -102,8 +113,20 @@ namespace hair_harmony_be.controller
 
             if (request.StylistId.HasValue)
             {
-                var stylist = await _context.Users.FindAsync(request.StylistId.Value);
+                var stylist = await _context.Users
+                 .Include(pt => pt.Role)
+                 .FirstOrDefaultAsync(pt => pt.Id == request.StylistId && pt.Role.Title == "stylist");
+
                 if (stylist == null) return NotFound("Stylist not found");
+
+                var paymentTransactionExist = await _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                .FirstOrDefaultAsync(pt => pt.Stylist.Id == request.StylistId && pt.Id == id);
+                if(paymentTransactionExist != null)
+                {
+                    return BadRequest(new { message = "This stylist was assgin for current service" });
+                }
                 paymentTransaction.Stylist = stylist;
             }
 

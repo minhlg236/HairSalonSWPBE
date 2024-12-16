@@ -4,10 +4,10 @@ namespace hair_harmony_be.hair_harmony_be.repositoty.model
 {
     public class Role
     {
-        public int Id { get; set; } // Đặt tên thuộc tính theo PascalCase để tuân theo chuẩn C#
+        public int Id { get; set; } 
         public string Title { get; set; }
-        public DateTime CreatedOn { get; set; } // Sử dụng DateTime thay cho date
-        public DateTime UpdatedOn { get; set; } // Sử dụng DateTime thay cho date
+        public DateTime CreatedOn { get; set; } 
+        public DateTime UpdatedOn { get; set; } 
         public bool Status { get; set; }
 
     }

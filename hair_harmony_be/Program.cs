@@ -39,6 +39,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("staff", policy => policy.RequireRole("staff"));
     options.AddPolicy("stylist", policy => policy.RequireRole("stylist"));
     options.AddPolicy("user", policy => policy.RequireRole("user"));
+    
+    options.AddPolicy("AdminOrStaff", policy =>
+            policy.RequireRole("admin", "staff"));
+    
 });
 
 // Cấu hình Swagger
