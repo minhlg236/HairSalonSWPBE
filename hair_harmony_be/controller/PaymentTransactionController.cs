@@ -136,6 +136,7 @@ namespace hair_harmony_be.controller
                 .Include(pt => pt.Stylist)
                 .Include(pt => pt.Booking)
                 .ThenInclude(b => b.Service)
+                .ThenInclude(b => b.CategoryService)
                 .Include(pt => pt.CreatedBy)
                 .Include(pt => pt.UpdatedBy)
                 .Where(pt => pt.Status == true);
@@ -235,6 +236,7 @@ namespace hair_harmony_be.controller
                 .Include(pt => pt.Stylist)
                 .Include(pt => pt.Booking)
                 .ThenInclude(b => b.Service)
+                .ThenInclude(b => b.CategoryService)
                 .Where(pt => pt.Stylist.Id == stylistId)
                 .Where(pt => pt.Status == true);
 

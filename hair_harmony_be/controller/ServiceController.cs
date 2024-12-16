@@ -18,7 +18,7 @@ namespace hair_harmony_be.controller
         }
 
         [HttpPost("create")]
-        [Authorize(Policy = "staff")]
+        [Authorize(Policy = "admin")]
         public async Task<IActionResult> CreateService([FromBody] ServiceCreateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -29,6 +29,11 @@ namespace hair_harmony_be.controller
 
             var userId = int.Parse(userIdClaim.Value);
             var creator = await _context.Users.FindAsync(userId);
+            var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId);
+            if (existingCategoryService == null)
+            {
+                return NotFound(new { message = "Category Service not found." });
+            }
 
             if (string.IsNullOrWhiteSpace(request.Title))
             {
@@ -65,7 +70,8 @@ namespace hair_harmony_be.controller
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow,
                 CreatedBy = creator,
-                UpdatedBy = creator
+                UpdatedBy = creator,
+                CategoryService = existingCategoryService,
             };
 
             _context.Services.Add(newService);
@@ -79,7 +85,7 @@ namespace hair_harmony_be.controller
         }
 
         [HttpPut("update/{id}")]
-        [Authorize(Policy = "staff")]
+        [Authorize(Policy = "admin")]
         public async Task<IActionResult> UpdateService(int id, [FromBody] ServiceUpdateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -90,11 +96,20 @@ namespace hair_harmony_be.controller
 
             var userId = int.Parse(userIdClaim.Value);
             var updateBy = await _context.Users.FindAsync(userId);
+
+            var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId);
+            if (existingCategoryService == null)
+            {
+                return NotFound(new { message = "Category Service not found." });
+            }
+
+
             var existingService = await _context.Services.FirstOrDefaultAsync(s => s.Id == id);
             if (existingService == null)
             {
                 return NotFound(new { message = "Service not found." });
             }
+            existingService.CategoryService = existingCategoryService;
 
             if (request is null || (request.Title == null && request.Description == null &&
                         !request.Price.HasValue && !request.TimeService.HasValue &&
@@ -160,6 +175,8 @@ namespace hair_harmony_be.controller
 
             var styles = await _context.Services
                 .Where(s => s.Status)
+                .Include(i => i.CategoryService)
+
                 .Skip(skip)
             .Take(pageSize)
                 .ToListAsync();
@@ -200,5 +217,37 @@ namespace hair_harmony_be.controller
             return Ok(services);
         }
 
+
+        [HttpGet("detail/{serviceId}")]
+        public async Task<IActionResult> GetServiceDetail(int serviceId)
+        {
+            var service = await _context.Services
+                .Include(s => s.CategoryService)
+                .FirstOrDefaultAsync(s => s.Id == serviceId);
+
+            if (service == null)
+            {
+                return NotFound(new { message = "Service not found." });
+            }
+
+            var images = await _context.Images
+                .Where(i => i.Status && i.ServiceEntity != null && i.ServiceEntity.Id == serviceId)
+                .ToListAsync();
+
+            var groupedImages = images
+                .GroupBy(i => i.ServiceEntity.Id)
+                .ToList();
+
+            var serviceDetail = new
+            {
+                Service = service,
+                Images = groupedImages
+                    .Where(g => g.Key == service.Id)
+                    .Select(g => g.ToList())
+                    .FirstOrDefault() ?? new List<Image>()
+            };
+
+            return Ok(serviceDetail);
+        }
     }
 }

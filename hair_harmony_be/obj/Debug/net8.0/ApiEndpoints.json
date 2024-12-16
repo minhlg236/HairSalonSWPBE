@@ -111,26 +111,6 @@
   },
   {
     "ContainingType": "hair_harmony_be.hair_harmony_be.Controllers.ImageController",
-    "Method": "GetImages",
-    "RelativePath": "api/Image",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[hair_harmony_be.hair_harmony_be.repositoty.model.Image, hair_harmony_be, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "hair_harmony_be.hair_harmony_be.Controllers.ImageController",
     "Method": "GetImage",
     "RelativePath": "api/Image/{id}",
     "HttpMethod": "GET",
@@ -188,6 +168,26 @@
     "ReturnTypes": [
       {
         "Type": "hair_harmony_be.hair_harmony_be.repositoty.model.Image",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "hair_harmony_be.hair_harmony_be.Controllers.ImageController",
+    "Method": "GetImages",
+    "RelativePath": "api/Image/getAll",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[hair_harmony_be.hair_harmony_be.repositoty.model.Image, hair_harmony_be, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

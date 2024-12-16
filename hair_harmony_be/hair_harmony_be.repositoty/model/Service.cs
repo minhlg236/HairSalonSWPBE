@@ -13,6 +13,7 @@
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
         public bool Status { get; set; }
+        public CategoryService CategoryService { get; set; }
 
     }
 
@@ -23,7 +24,7 @@
         public double Price { get; set; }
         public double? Discount { get; set; }
         public double? TimeService { get; set; }
-
+        public int? CategoryServiceId { get; set; }
 
     }
 
@@ -35,6 +36,7 @@
         public double? Discount { get; set; }
         public double? Commission { get; set; }
         public double? TimeService { get; set; }
+        public int? CategoryServiceId { get; set; }
 
         public bool? Status { get; set; }
 

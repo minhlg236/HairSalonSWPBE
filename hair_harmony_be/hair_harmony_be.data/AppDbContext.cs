@@ -15,6 +15,8 @@ namespace HairSalon.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<CategoryService> CategoryServices { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            
@@ -41,6 +43,12 @@ namespace HairSalon.Data
                .WithMany()
                .HasForeignKey("createdBy");
 
+            modelBuilder.Entity<Service>()
+             .HasOne(u => u.CategoryService)
+             .WithMany()
+             .HasForeignKey("categoryServiceId");
+
+            // booking
             modelBuilder.Entity<Booking>()
             .HasOne(b => b.Service)
             .WithMany()
@@ -71,6 +79,21 @@ namespace HairSalon.Data
                .HasOne(b => b.Stylist)
                .WithMany()
                .HasForeignKey("stylistId");
+
+            // category
+    
+
+            modelBuilder.Entity<CategoryService>()
+                .HasOne(b => b.CreatedBy)
+                .WithMany()
+                .HasForeignKey("createdBy");
+
+            modelBuilder.Entity<CategoryService>()
+                .HasOne(b => b.UpdatedBy)
+                .WithMany()
+                .HasForeignKey("updatedBy");
+
+           
         }
     }
 }

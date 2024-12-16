@@ -48,7 +48,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpPost ("add")]
-        [Authorize(Policy = "staff")]
+        [Authorize(Policy = "admin")]
         public async Task<ActionResult<Image>> PostImage(ImageAddDTO imageDto)
         {
             if (imageDto == null)
@@ -88,7 +88,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpPut("update/{id}")]
-        [Authorize(Policy = "staff")]
+        [Authorize(Policy = "admin")]
         public async Task<IActionResult> PutImage(int id, ImageAddDTO imageDto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -123,7 +123,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "staff")]
+        [Authorize(Policy = "admin")]
         public async Task<IActionResult> DeleteImage(int id)
         {
             var image = await _context.Images.FirstOrDefaultAsync(i => i.Id == id);

@@ -81,6 +81,7 @@ namespace hair_harmony_be.controller
         {
             var booking = await _context.Bookings
                 .Include(b => b.Service)
+                .ThenInclude(bb => bb.CategoryService)
                 .Include(b => b.CreatedBy)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
@@ -113,6 +114,7 @@ namespace hair_harmony_be.controller
 
             var bookingsQuery = _context.Bookings
                 .Include(b => b.Service)
+                .ThenInclude(bb => bb.CategoryService)
                 .Include(b => b.CreatedBy)
                 .Where(b => b.CreatedBy.Id == userId);
 
@@ -251,6 +253,7 @@ namespace hair_harmony_be.controller
 
             var bookingsQuery = _context.Bookings
                 .Include(b => b.Service)
+                .ThenInclude(bb => bb.CategoryService)
                 .Include(b => b.CreatedBy)
                 .Where(b => b.Status == status);
 
