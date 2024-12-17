@@ -42,7 +42,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpPost("add")]
-        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "AdminOrStaff")]
         public async Task<ActionResult<CategoryService>> PostCategoryService(CategoryServiceAddDTO categoryDto)
         {
             if (categoryDto == null)
@@ -76,7 +76,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpPut("update/{id}")]
-        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "AdminOrStaff")]
         public async Task<IActionResult> PutCategoryService(int id, CategoryServiceAddDTO categoryDto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -105,7 +105,7 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
         }
 
         [HttpPut("softDelete/{id}")]
-        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "AdminOrStaff")]
         public async Task<IActionResult> DeleteCategoryService(int id)
         {
             var category = await _context.CategoryServices.FirstOrDefaultAsync(c => c.Id == id);

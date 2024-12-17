@@ -315,38 +315,34 @@ namespace hair_harmony_be.controller
             {
                 return NotFound(new { message = "User not found." });
             }
-            if(request is null)
+            if (request is null)
             {
-                return BadRequest(new { message = "not found data input" });
+                return BadRequest(new { message = "No data input found." });
             }
+
             var service = await _context.Services.FindAsync(request.ServiceId);
             if (service == null)
             {
                 return NotFound(new { message = "Service not found." });
             }
 
-            var errors = new List<object>();
-            var createdBookings = new List<Booking>();
-
             foreach (var startTimeString in request.StartTimes)
             {
                 if (!DateTime.TryParse(startTimeString, out var startTime))
                 {
-                    errors.Add(new { StartTime = startTimeString, Message = "Invalid StartTime format. Use a valid DateTime string." });
-                    continue;
+                    return BadRequest(new { message = $"Invalid StartTime format for {startTimeString}. Use a valid DateTime string." });
                 }
 
                 var existingBooking = await _context.Bookings
                     .Where(b => b.CreatedBy.Id == userId &&
                                 b.Service.Id == request.ServiceId &&
-                                (b.Status == "booked" || b.Status == "confirmed"))
-
+                                (b.Status == "booked" || b.Status == "confirmed" || b.Status == "check-in") &&
+                                b.StartTime == startTime)
                     .FirstOrDefaultAsync();
 
                 if (existingBooking != null)
                 {
-                    errors.Add(new { StartTime = startTimeString, Message = "A booking already exists with the same service and user." });
-                    continue;
+                    return Conflict(new { message = $"A booking already exists with the same service and StartTime {startTimeString}." });
                 }
 
                 var booking = new Booking
@@ -360,21 +356,17 @@ namespace hair_harmony_be.controller
                     Note = request.Note ?? ""
                 };
 
-                createdBookings.Add(booking);
                 _context.Bookings.Add(booking);
             }
 
-            if (createdBookings.Count > 0)
-            {
-                await _context.SaveChangesAsync();
-            }
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
-                CreatedBookings = createdBookings.Select(b => new { b.Id, b.StartTime, b.Service, b.Status, b.Note }),
-                Errors = errors
+                message = "Bookings created successfully."
             });
         }
+
 
 
     }

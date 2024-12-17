@@ -751,6 +751,22 @@
   },
   {
     "ContainingType": "hair_harmony_be.controller.UserController",
+    "Method": "ActiveAccount",
+    "RelativePath": "api/User/activeAccount/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "hair_harmony_be.controller.UserController",
     "Method": "CreateUser",
     "RelativePath": "api/User/create-user",
     "HttpMethod": "POST",
