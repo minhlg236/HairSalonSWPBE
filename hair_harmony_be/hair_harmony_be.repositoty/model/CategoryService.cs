@@ -18,4 +18,10 @@
         public string? Description { get; set; }
     }
 
+    public class UpdateStatusRequest
+    {
+        public bool Status { get; set; }
+    }
+
+
 }
