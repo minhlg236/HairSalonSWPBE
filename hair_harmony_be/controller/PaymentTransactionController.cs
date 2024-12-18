@@ -438,7 +438,52 @@ namespace hair_harmony_be.controller
         }
 
 
+        [HttpGet("getWithRejectAndPaid")]
+        [Authorize(Policy = "staff")]
+        public async Task<IActionResult> GetPaymentTransactionsWithRejectAndPaid(
+           [FromQuery] int page = 1,
+           [FromQuery] int size = 10
+       )
+        {
 
+            var query = _context.PaymentTransactions
+                .Include(pt => pt.Stylist)
+                .Include(pt => pt.Booking)
+                .ThenInclude(b => b.Service)
+                .ThenInclude(b => b.CategoryService)
+                .Include(pt => pt.CreatedBy)
+                .Include(pt => pt.UpdatedBy)
+                .Where(pt => pt.Status == true)
+                .Where(pt => pt.Booking.Status == "paid");
+
+            var totalRecords = await query.CountAsync();
+
+            var paymentTransactions = await query
+                .OrderBy(pt => pt.CreatedOn)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            var result = paymentTransactions.Select(pt =>
+            {
+                var bookingId = pt.Booking?.Id ?? 0;
+                return new PaymentTransactionDTO
+                {
+                    Id = pt.Id,
+                    Booking = pt.Booking,
+                    Service = pt.Booking.Service,
+                    CreatedBy = pt.CreatedBy,
+                };
+            }).ToList();
+
+            return Ok(new
+            {
+                TotalRecords = totalRecords,
+                TotalPages = (int)Math.Ceiling((double)totalRecords / size),
+                CurrentPage = page,
+                PaymentTransactions = result ?? new List<PaymentTransactionDTO>()
+            });
+        }
 
     }
 

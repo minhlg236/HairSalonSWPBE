@@ -277,5 +277,130 @@ namespace hair_harmony_be.controller
 
             return Ok(serviceDetail);
         }
+
+
+        [HttpPut("update-all/{id}")]
+        [Authorize(Policy = "AdminOrStaff")]
+        public async Task<IActionResult> UpdateServiceAll(int id, [FromBody] ServiceUpdateRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token or user ID not found in token." });
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+            var updateBy = await _context.Users.FindAsync(userId);
+
+            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.Id == id);
+            if (existingService == null)
+            {
+                return NotFound(new { message = "Service not found." });
+            }
+
+            if (request is null || (request.Title == null && request.Description == null &&
+                        !request.Price.HasValue && !request.TimeService.HasValue &&
+                        !request.Status.HasValue))
+            {
+                return BadRequest(new { message = "At least one field must be provided for update." });
+            }
+            if ((request.CategoryServiceId.HasValue))
+            {
+                var existingCategoryService = await _context.CategoryServices.FirstOrDefaultAsync(s => s.Id == request.CategoryServiceId && s.Status == true);
+                if (existingCategoryService == null)
+                {
+                    return NotFound(new { message = "Category Service not found." });
+                }
+                existingService.CategoryService = existingCategoryService;
+            }
+            if (!string.IsNullOrWhiteSpace(request.Title))
+            {
+                existingService.Title = request.Title;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Description))
+            {
+                existingService.Description = request.Description;
+            }
+
+            if (request.Price.HasValue && request.Price > 0)
+            {
+                existingService.Price = request.Price.Value;
+            }
+
+            if (request.TimeService.HasValue && request.TimeService > 0)
+            {
+                existingService.TimeService = request.TimeService.Value;
+            }
+
+            if (request.Discount.HasValue && request.Discount > 0)
+            {
+                existingService.Discount = request.Discount.Value;
+            }
+            if (request.Status.HasValue)
+            {
+                if (request.Status is bool)
+                {
+                    existingService.Status = request.Status.Value;
+                }
+                else
+                {
+                    return BadRequest(new { message = "Invalid status value. Status must be a boolean." });
+                }
+            }
+            existingService.UpdatedOn = DateTime.UtcNow;
+            existingService.UpdatedBy = updateBy;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Service updated successfully.", service = existingService, status = 201 });
+        }
+
+
+        [HttpGet("getAllService")]
+        public async Task<IActionResult> GetAllService(
+  int categoryServiceId,
+  string keyword = "",
+  int page = 1,
+  int pageSize = 10)
+        {
+            var skip = (page - 1) * pageSize;
+
+            var query = _context.Services
+                .Where(s => s.CategoryService != null &&
+                            s.CategoryService.Status);
+
+            if (categoryServiceId != 0)
+            {
+                query = query.Where(s => s.CategoryService.Id == categoryServiceId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(s =>
+                    s.Title.Contains(keyword) || s.Description.Contains(keyword) ||
+                    s.CategoryService.Title.Contains(keyword) || s.CategoryService.Description.Contains(keyword));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var services = await query
+                .Include(i => i.CategoryService)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync();
+
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            return Ok(new
+            {
+                Items = services.ToList(),
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                PageSize = pageSize
+            });
+        }
     }
 }

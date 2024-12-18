@@ -137,5 +137,28 @@ namespace hair_harmony_be.hair_harmony_be.Controllers
             return Ok(new { message = "CategoryService status updated successfully." });
         }
 
+        [HttpPut("changeStatus/{id}")]
+        [Authorize(Policy = "AdminOrStaff")]
+        public async Task<IActionResult> ChangeCategoryServiceStatus(int id)
+        {
+            var category = await _context.CategoryServices.FirstOrDefaultAsync(c => c.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            category.Status = !category.Status;
+            _context.CategoryServices.Update(category);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpGet("getActive")]
+        public async Task<ActionResult<IEnumerable<CategoryService>>> GetCategoryServicesActive()
+        {
+            var categories = await _context.CategoryServices.Where(c => c.Status).ToListAsync();
+            return Ok(categories);
+        }
+
     }
 }
