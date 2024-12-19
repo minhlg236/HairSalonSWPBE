@@ -472,7 +472,6 @@ namespace hair_harmony_be.controller
                     Id = pt.Id,
                     Booking = pt.Booking,
                     Service = pt.Booking.Service,
-                    CreatedBy = pt.CreatedBy,
                 };
             }).ToList();
 
